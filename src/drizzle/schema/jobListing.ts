@@ -1,6 +1,8 @@
 import { pgTable, pgEnum, text, timestamp, varchar, integer, boolean, index } from "drizzle-orm/pg-core";
 import { createdAt, updatedAt, id } from "../schemaHelpers";
-import { OrganizationTable } from "./orgainizations";
+import { OrganizationTable } from "./orgainization";
+import { relations } from "drizzle-orm";
+import { JobListingApplicationTable } from "./jobListingApplication";
 
 export const wageIntervals = ['hourly', 'yearly'] as const
 export type WageInterval = (typeof wageIntervals)[number]
@@ -34,10 +36,18 @@ export const JobListingTable = pgTable('job_listings', {
     isFeatured: boolean().notNull().default(false),
     locationRequirement: locationRequirementEnum().notNull(),
     experienceLevel: experienceLevelEnum().notNull(),
-    status: jobListingStatusEnum().notNull().default("draft"),
+    status: jobListingStatusEnum().notNull(),
     type: jobListingTypeEnum().notNull(),
-    postedAt: timestamp({withTimezone: true}).notNull().defaultNow(),
+    postedAt: timestamp({withTimezone: true}),
     createdAt,
     updatedAt,
 },
-table => [index('job_listings_province_abbreviation_index').on(table.provinceAbbreviation)]);
+table => [index().on(table.provinceAbbreviation)]);
+
+export const JobListingReferences = relations(JobListingTable, ({ one, many }) => ({
+    organization: one(OrganizationTable, {
+        fields: [JobListingTable.organizationId],
+        references: [OrganizationTable.id],
+    }),
+    applications: many(JobListingApplicationTable),
+}))
