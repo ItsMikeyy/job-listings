@@ -1,5 +1,8 @@
-import { Sidebar, SidebarHeader, SidebarProvider, SidebarTrigger, SidebarContent, SidebarFooter, SidebarMenu, SidebarMenuItem, SidebarMenuButton } from "@/components/ui/sidebar";
+import { Sidebar, SidebarHeader, SidebarProvider, SidebarTrigger, SidebarContent, SidebarFooter, SidebarMenu, SidebarMenuItem, SidebarMenuButton, SidebarGroup } from "@/components/ui/sidebar";
 import AppSidebarClient from "./_AppSidebarClient";
+import { LogInIcon } from "lucide-react";
+import Link from "next/link";
+import { SignedOut } from "@/services/clerk/components/SignInStatus";
 
 const Home = () => {
   return (
@@ -11,7 +14,20 @@ const Home = () => {
           <span className="text-xl text-nowrap">JOBS</span>
         </SidebarHeader>
         <SidebarContent>
-          asdsad
+          <SidebarGroup >
+            <SidebarMenu>
+                <SignedOut>
+                  <SidebarMenuItem>
+                    <SidebarMenuButton asChild>
+                      <Link href="/sign-in">
+                        <LogInIcon />
+                        <span>Login</span>
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                </SignedOut>
+            </SidebarMenu>
+          </SidebarGroup>
         </SidebarContent>
         <SidebarFooter>
           <SidebarMenu>
