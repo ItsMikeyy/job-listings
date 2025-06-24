@@ -2,7 +2,8 @@ import { Sidebar, SidebarHeader, SidebarProvider, SidebarTrigger, SidebarContent
 import AppSidebarClient from "./_AppSidebarClient";
 import { LogInIcon } from "lucide-react";
 import Link from "next/link";
-import { SignedOut } from "@/services/clerk/components/SignInStatus";
+import { SignedIn, SignedOut } from "@/services/clerk/components/SignInStatus";
+import { SidebarUserButton } from "./features/users/components/SidebarUserButton";
 
 const Home = () => {
   return (
@@ -20,8 +21,10 @@ const Home = () => {
                   <SidebarMenuItem>
                     <SidebarMenuButton asChild>
                       <Link href="/sign-in">
-                        <LogInIcon />
-                        <span>Login</span>
+                        <div className="flex items-center gap-2">
+                          <LogInIcon />
+                          <span>Login</span>
+                        </div>
                       </Link>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
@@ -29,13 +32,15 @@ const Home = () => {
             </SidebarMenu>
           </SidebarGroup>
         </SidebarContent>
-        <SidebarFooter>
-          <SidebarMenu>
-            <SidebarMenuItem>
-              <SidebarMenuButton>asdjsak</SidebarMenuButton>
-            </SidebarMenuItem>
-          </SidebarMenu>
-        </SidebarFooter>
+        <SignedIn>
+          <SidebarFooter>
+            <SidebarMenu>
+              <SidebarMenuItem>
+                <SidebarUserButton />
+              </SidebarMenuItem>
+            </SidebarMenu>
+          </SidebarFooter>
+        </SignedIn>
       </Sidebar>
     <main className="flex-1">adkals</main>
     </AppSidebarClient>
