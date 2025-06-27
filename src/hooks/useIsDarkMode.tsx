@@ -1,22 +1,27 @@
-
 import { useEffect, useState } from "react"
 
 export const useIsDarkMode = () => {
-    const [isDarkMode, setIsDarkMode] = useState(()=> {
-        if (typeof window === "undefined") return false
-        return window.matchMedia("(prefers-color-scheme: dark)").matches
-    })
-    useEffect(() => {
-        const controller = new AbortController()
+    const [isDarkMode, setIsDarkMode] = useState(false)
+    const [mounted, setMounted] = useState(false)
 
-        window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", (e) => {
+    useEffect(() => {
+        setMounted(true)
+        setIsDarkMode(window.matchMedia("(prefers-color-scheme: dark)").matches)
+        
+        const controller = new AbortController()
+        const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)")
+        
+        const handleChange = (e: MediaQueryListEvent) => {
             setIsDarkMode(e.matches)
-        }, {signal: controller.signal})
+        }
+        
+        mediaQuery.addEventListener("change", handleChange, { signal: controller.signal })
         
         return () => {
             controller.abort()
         }
     }, [])
 
-    return isDarkMode
+    // Return false during SSR and initial render to prevent hydration mismatch
+    return mounted ? isDarkMode : false
 }
