@@ -1,31 +1,22 @@
 import { AppSidebar } from "@/components/sidebar/AppSidebar";
-import { SidebarGroup, SidebarMenu, SidebarMenuItem, SidebarMenuButton } from "@/components/ui/sidebar";
+import { SidebarGroup, SidebarMenu, SidebarMenuItem, SidebarMenuButton,  } from "@/components/ui/sidebar";
 import { SignedOut } from "@/services/clerk/components/SignInStatus";
-import { LogInIcon } from "lucide-react";
+import { BrainCircuitIcon, ClipboardListIcon, LayoutDashboard, LogInIcon } from "lucide-react";
 import Link from "next/link";
 import { SidebarUserButton } from "@/app/features/users/components/SidebarUserButton";
-
+import { SidebarNavMenuGroup } from "@/components/sidebar/SidebarNavMenuGroup";
 export default function JobSeekerLayout({children}: {children: React.ReactNode}) {
     return (
         <AppSidebar content=
         {
-            <SidebarGroup >
-                <SidebarMenu>
-                    <SignedOut>
-                    <SidebarMenuItem>
-                        <SidebarMenuButton asChild>
-                        <Link href="/sign-in">
-                            <div className="flex items-center gap-2">
-                            <LogInIcon />
-                            <span>Login</span>
-                            </div>
-                        </Link>
-                        </SidebarMenuButton>
-                    </SidebarMenuItem>
-                    </SignedOut>
-                </SidebarMenu>
-            </SidebarGroup>
-        } 
+           <SidebarNavMenuGroup className="mt-auto" items={[
+            {href: "/", label: "Job Board", icon: <ClipboardListIcon />},
+            {href: "/ai-search", label: "AI Search", icon: <BrainCircuitIcon />},
+            {href: "/employer", label: "Employer Dashboard", icon: <LayoutDashboard />, authStatus: "signedIn"},
+            {href: "/sign-in", label: "Sign In", icon: <LogInIcon />, authStatus: "signedOut"},
+        ]}
+        />
+      } 
         footerButton={<SidebarUserButton />}>
         {children}
       </AppSidebar>

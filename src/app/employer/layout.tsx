@@ -1,32 +1,44 @@
 import { AppSidebar } from "@/components/sidebar/AppSidebar";
-import { SidebarGroup, SidebarMenu, SidebarMenuItem, SidebarMenuButton } from "@/components/ui/sidebar";
-import { SignedOut } from "@/services/clerk/components/SignInStatus";
-import { LogInIcon } from "lucide-react";
+import { SidebarGroup, SidebarGroupAction, SidebarGroupLabel } from "@/components/ui/sidebar";
+import { ClipboardListIcon, PlusIcon } from "lucide-react";
+import { SidebarNavMenuGroup } from "@/components/sidebar/SidebarNavMenuGroup";
 import Link from "next/link";
-import { SidebarUserButton } from "@/app/features/users/components/SidebarUserButton";
+import { SidebarOrganizationButton } from "../features/organizations/components/SidebarOrganizationButton";
+import { getCurrentOrganization } from "@/services/clerk/lib/getCurrentAuth";
+import { redirect } from "next/navigation";
 
 export default function EmployerLayout({children}: {children: React.ReactNode}) {
     return (
+        <LayoutSuspense>
+            {children}
+        </LayoutSuspense>
+    )
+}
+async function LayoutSuspense({children}: {children: React.ReactNode}) {
+    const {orgId} = await getCurrentOrganization()
+    if (orgId == null) {
+        return redirect("/organizations/select")
+    }
+    return (
         <AppSidebar content=
         {
-            <SidebarGroup >
-                <SidebarMenu>
-                    <SignedOut>
-                    <SidebarMenuItem>
-                        <SidebarMenuButton asChild>
-                        <Link href="/sign-in">
-                            <div className="flex items-center gap-2">
-                            <LogInIcon />
-                            <span>Login</span>
-                            </div>
+            <>
+                <SidebarGroup>
+                    <SidebarGroupLabel>Job Listings</SidebarGroupLabel>
+                    <SidebarGroupAction title="Add Job Listing" asChild>
+                        <Link href="/employer/job-listings/new" className="flex items-center gap-2">
+                            <PlusIcon /> 
+                            <span className="sr-only">Add Job Listing</span>
                         </Link>
-                        </SidebarMenuButton>
-                    </SidebarMenuItem>
-                    </SignedOut>
-                </SidebarMenu>
-            </SidebarGroup>
+                    </SidebarGroupAction>
+                </SidebarGroup>
+                <SidebarNavMenuGroup className="mt-auto" items={[
+                    {href: "/", label: "Job Board", icon: <ClipboardListIcon />},
+                ]}
+                />
+            </>
         } 
-        footerButton={<SidebarUserButton />}>
+        footerButton={<SidebarOrganizationButton />}>
         {children}
       </AppSidebar>
     )

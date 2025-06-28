@@ -1,3 +1,4 @@
+"use client"
 import { SignedIn, SignedOut } from "@/services/clerk/components/SignInStatus"
 import { SidebarGroup, SidebarMenuButton, SidebarMenuItem } from "../ui/sidebar"
 
@@ -11,7 +12,7 @@ export const SidebarNavMenuGroup = ({items, className}: {
         href: string,
         icon: React.ReactNode,
         label: string,
-        authStatus: "signedOut" | "signedIn"
+        authStatus?: "signedOut" | "signedIn"
     }[]
     className?: string
     }) => {
