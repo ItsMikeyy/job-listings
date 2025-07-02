@@ -4,6 +4,7 @@ import { env } from "@/data/env/server";
 import { NonRetriableError } from "inngest";
 import { insertUser, updateUser, deleteUser } from "@/app/features/db/users";
 import { insertUserNotificationSettings } from "@/app/features/db/userNotificationSettings";
+import { deleteOrganization, insertOrganization, updateOrganization } from "@/app/features/organizations/db/organizations";
 
 const verifyWebhook = ({raw, headers} : {
     raw: string,
@@ -108,6 +109,89 @@ export const clerkDeleteUser = inngest.createFunction(
         throw new NonRetriableError("No user ID found in webhook data");
       }
       await deleteUser(id)
+    })
+  }
+)
+
+export const clerkCreateOrganization = inngest.createFunction(
+  {
+  id: "clerk/create-db-organization",
+  name: "Clerk - Create DB Organization",
+  },
+  {
+    event: "clerk/organization.created",
+  }, 
+  async ({event, step}) => {
+    await step.run("verify-webhook", async () => {
+      try {
+        verifyWebhook(event.data)
+      } catch (error) {
+        throw new NonRetriableError("Invalid webhook signature");
+      }
+    })
+    await step.run("create-organization", async () => {
+      const organizationData = event.data.data
+
+      await insertOrganization({
+        id: organizationData.id,
+        name: organizationData.name,
+        imageUrl: organizationData.image_url,
+        createdAt: new Date(organizationData.created_at),
+        updatedAt: new Date(organizationData.updated_at),
+      })
+    })
+  }
+)
+
+export const clerkUpdateOrganization = inngest.createFunction(
+  {
+    id: "clerk/update-db-organization",
+    name: "Clerk - Update DB Organization",
+  },
+  {
+    event: "clerk/organization.updated",
+  },
+  async ({event, step}) => {
+    await step.run("verify-webhook", async () => {
+      try {
+        verifyWebhook(event.data)
+      } catch (error) {
+        throw new NonRetriableError("Invalid webhook signature");
+      }
+    })
+    await step.run("update-organization", async () => {
+      const organizationData = event.data.data
+      await updateOrganization(organizationData.id, {
+        name: organizationData.name,
+        imageUrl: organizationData.image_url,
+        updatedAt: new Date(organizationData.updated_at),
+      })
+    })
+  }
+)
+
+export const clerkDeleteOrganization = inngest.createFunction(
+  {
+    id: "clerk/delete-db-organization",
+    name: "Clerk - Delete DB Organization",
+  },
+  {
+    event: "clerk/organization.deleted",
+  },
+  async ({event, step}) => {
+    await step.run("verify-webhook", async () => {
+      try {
+        verifyWebhook(event.data)
+      } catch (error) {
+        throw new NonRetriableError("Invalid webhook signature");
+      }
+    })
+    await step.run("delete-organization", async () => {
+      const organizationData = event.data.data
+      if (organizationData.id == null) {
+        throw new NonRetriableError("No organization ID found in webhook data");
+      }
+      await deleteOrganization(organizationData.id)
     })
   }
 )
